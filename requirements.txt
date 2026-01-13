@@ -1,0 +1,10 @@
+PySide6
+crawl4ai
+pydantic
+pydantic-settings
+loguru
+qasync
+playwright
+python-dotenv
+beautifulsoup4
+litellm

@@ -1,0 +1,30 @@
+{
+    "batdongsan.com.vn": {
+        "wait_for": ".re__srp-list",
+        "js_code": [
+            "window.scrollTo(0, 0);",
+            "await new Promise(r => setTimeout(r, 1000));",
+            "window.scrollTo(0, document.body.scrollHeight/4);",
+            "await new Promise(r => setTimeout(r, 1500));",
+            "window.scrollTo(0, document.body.scrollHeight/2);",
+            "await new Promise(r => setTimeout(r, 1500));",
+            "window.scrollTo(0, document.body.scrollHeight*3/4);",
+            "await new Promise(r => setTimeout(r, 1500));",
+            "window.scrollTo(0, document.body.scrollHeight);",
+            "await new Promise(r => setTimeout(r, 2000));"
+        ],
+        "timeout": 60000,
+        "scroll_mode": false,
+        "scroll_depth": 5
+    },
+    "alonhadat.com.vn": {
+        "wait_for": ".content-items",
+        "scroll_mode": true,
+        "timeout": 45000
+    },
+    "chotot.com": {
+        "wait_for": "div[class*='ListAd']",
+        "scroll_mode": true,
+        "scroll_depth": 10
+    }
+}

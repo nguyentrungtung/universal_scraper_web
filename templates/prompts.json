@@ -1,0 +1,7 @@
+{
+    "Bất động sản (Mặc định)": "Identify and extract each property listing as a separate object. Each object MUST correspond to exactly ONE visual card on the page. DO NOT mix the title of one listing with the description of another. For each record, extract: id, title, price, area, location, description, contact_phone, link_detail, source, and link_url.",
+    "Thương mại điện tử (Sản phẩm)": "Extract product information. For each product, include: product_name, price, discount, rating, link_detail (URL to product page), source (website name), and link_url (current page URL).",
+    "Tin tức / Blog": "Extract the main articles. For each article, include: headline, author, publication_date, summary, link_detail (URL to full article), source (website name), and link_url (current page URL).",
+    "Danh sách Công ty / Nhân sự": "Extract profiles. For each profile, include: name, role/industry, contact_info, website, link_detail (URL to profile page), source (website name), and link_url (current page URL).",
+    "Tóm tắt nội dung chính": "Summarize the main content into bullet points. For the summary object, include: key_takeaways, source (website name), and link_url (current page URL)."
+}

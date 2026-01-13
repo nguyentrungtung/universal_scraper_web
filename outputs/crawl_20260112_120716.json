@@ -1,0 +1,41 @@
+[
+    {
+        "id": "1",
+        "source": "batdongsan.com.vn",
+        "link_url": "https://batdongsan.com.vn/nha-dat-ban",
+        "link_detail": "https://batdongsan.com.vn/ban-can-ho-chung-cu-phuong-tay-mo-prj-the-sapphire-vinhomes-smart-city/bql-cap-nhat-quy-studio-2ty-1n-2-8-ty-2n-3-2-ty-2n-1-3-9ty-3n-4-5ty-pr43768302",
+        "title": "Ban Q.Lý Vinhomes SmartCity cập nhật quỹ căn: Studio 2,5tỷ; 1N+ 3,5tỷ; 2N 4,2tỷ; 2N+1 5tỷ; 3N 5,8tỷ",
+        "price": "4.2 tỷ",
+        "area": "59 m²",
+        "location": "Nam Từ Liêm, Hà Nội",
+        "description": "",
+        "contact_phone": "0983 368 ***",
+        "error": false
+    },
+    {
+        "id": "2",
+        "source": "batdongsan.com.vn",
+        "link_url": "https://batdongsan.com.vn/nha-dat-ban",
+        "link_detail": "https://batdongsan.com.vn/ban-nha-biet-thu-lien-ke-xa-tan-hoi-7-prj-vinhomes-wonder-city/don-gia-tu-133-trieu-m2-qua-tang-len-den-2-ty-tru-vao-gia-ban-tang-xe-vf7-va-vf8-lh-pr44198811",
+        "title": "Biệt thự song lập 228-288m2 giá 32,5 tỷ chiết khấu 18% đơn giá 134tr/m2, liền kề 20 tỷ, tặng xe VF8 38,59 tỷ",
+        "price": "32.5 tỷ",
+        "area": "228-288 m²",
+        "location": "Đan Phượng, Hà Nội",
+        "description": "",
+        "contact_phone": "0942 906 ***",
+        "error": false
+    },
+    {
+        "id": "3",
+        "source": "batdongsan.com.vn",
+        "link_url": "https://batdongsan.com.vn/nha-dat-ban",
+        "link_detail": "https://batdongsan.com.vn/ban-nha-mat-pho-duong-dinh-thi-thi-phuong-hiep-binh-phuoc/gia-dau-tu-mt-thuc-quoc-lo-13-gan-van-phuc-chi-9-25-ty-moi-100-hiem-59m2-4-tang-pr45008443",
+        "title": "Giảm300 tr 9,25 tỷ Giá đầu tư MT thục quốc lộ 13 gần vạn phúc mới 100% Đinh thị thi 59m2 4 T",
+        "price": "9.25 tỷ",
+        "area": "59 m²",
+        "location": "Thủ Đức, Hồ Chí Minh",
+        "description": "",
+        "contact_phone": "0915 250 ***",
+        "error": false
+    }
+]

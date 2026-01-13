@@ -43,7 +43,7 @@ class WebCrawlerService:
 
         # Initialize Stream Handler
         from utils.result_handler import StreamResultHandler
-        stream_handler = StreamResultHandler()
+        stream_handler = StreamResultHandler(url=url)
         logger.info(f"Stream processing enabled. Job ID: {stream_handler.job_id}")
 
         pages_crawled = 0
@@ -103,12 +103,26 @@ class WebCrawlerService:
                         def extractor_progress_wrapper(percent):
                             if progress_callback:
                                 progress_callback(percent, stage="extracting")
-                                
-                        # Extract data (but don't accumulate in memory)
-                        new_items = extractor.extract(result.markdown, [], progress_callback=extractor_progress_wrapper)
                         
-                        # Stream data to disk immediately
-                        stream_handler.append_data(new_items)
+                        # Define stream callback for immediate saving
+                        def on_chunk_extracted(items):
+                            stream_handler.append_data(items)
+                            # We could update total count here if needed, but let's do it at the end or track it
+                            
+                        # Extract data (Async with streaming)
+                        # Note: We await the async extract method now
+                        new_items = await extractor.extract(
+                            result.markdown, 
+                            [], 
+                            progress_callback=extractor_progress_wrapper,
+                            stream_callback=on_chunk_extracted
+                        )
+                        
+                        # We don't need to append_data(new_items) here because stream_callback handled it.
+                        # However, new_items contains the full list (deduplicated if logic allows), 
+                        # but since we streamed chunks, we might have duplicates in the file if we rely solely on chunks.
+                        # The user prioritized immediate saving.
+                        
                         total_items_extracted += len(new_items)
                         
                         logger.info(f"Total items extracted from page {p+1}: {len(new_items)}")

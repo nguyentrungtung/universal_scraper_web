@@ -1,10 +1,24 @@
 import json
 import os
+import re
+from urllib.parse import urlparse
 from datetime import datetime
 from typing import Dict, Any, List
 from loguru import logger
 from utils.file_manager import ensure_dir
 from config.settings import PATHS_CONFIG
+
+def _get_domain_from_url(url: str) -> str:
+    try:
+        parsed = urlparse(url)
+        domain = parsed.netloc or parsed.path
+        # Remove www.
+        if domain.startswith("www."):
+            domain = domain[4:]
+        # Replace non-alphanumeric with _
+        return re.sub(r'[^a-zA-Z0-9]', '_', domain)
+    except:
+        return "unknown_site"
 
 class ResultHandler:
     @staticmethod
@@ -16,23 +30,35 @@ class ResultHandler:
         output_dir = PATHS_CONFIG["OUTPUT_DIR"]
         ensure_dir(output_dir)
 
+        # Generate filename prefix based on URL if available
+        prefix = "crawl"
+        if data.get("url"):
+            domain = _get_domain_from_url(data["url"])
+            prefix = f"{domain}_{timestamp}"
+        else:
+            prefix = f"crawl_{timestamp}"
+
         saved_files = []
 
         # 1. Save Markdown
         if data.get("markdown"):
-            md_filename = f"crawl_{timestamp}.md"
-            md_path = os.path.join(output_dir, md_filename)
-            try:
-                with open(md_path, "w", encoding="utf-8") as f:
-                    f.write(data["markdown"])
-                saved_files.append(md_path)
-                if log_callback: log_callback(f"Saved Markdown: {md_path}")
-            except Exception as e:
-                logger.error(f"Failed to save markdown: {e}")
+            # If markdown is just a path (from StreamResultHandler), don't save again unless it's content
+            if data["markdown"].startswith("Saved to"):
+                pass # Already saved
+            else:
+                md_filename = f"{prefix}.md"
+                md_path = os.path.join(output_dir, md_filename)
+                try:
+                    with open(md_path, "w", encoding="utf-8") as f:
+                        f.write(data["markdown"])
+                    saved_files.append(md_path)
+                    if log_callback: log_callback(f"Saved Markdown: {md_path}")
+                except Exception as e:
+                    logger.error(f"Failed to save markdown: {e}")
 
         # 2. Save JSON Data
         if data.get("extracted_data"):
-            json_filename = f"crawl_{timestamp}.json"
+            json_filename = f"{prefix}.json"
             json_path = os.path.join(output_dir, json_filename)
             try:
                 with open(json_path, "w", encoding="utf-8") as f:
@@ -48,9 +74,18 @@ class StreamResultHandler:
     """
     Xử lý việc lưu dữ liệu theo luồng (Stream) để tiết kiệm bộ nhớ.
     """
-    def __init__(self, job_id: str = None):
+    def __init__(self, job_id: str = None, url: str = None):
         self.timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        self.job_id = job_id or f"crawl_{self.timestamp}"
+        
+        if job_id:
+            self.job_id = job_id
+        else:
+            # Generate job_id based on URL if provided
+            if url:
+                domain = _get_domain_from_url(url)
+                self.job_id = f"{domain}_{self.timestamp}"
+            else:
+                self.job_id = f"crawl_{self.timestamp}"
         
         # Tạo đường dẫn file
         output_dir = PATHS_CONFIG["OUTPUT_DIR"]
@@ -66,7 +101,7 @@ class StreamResultHandler:
         # Init Markdown
         with open(self.md_file, "w", encoding="utf-8") as f:
             f.write(f"# Crawl Result for Job: {self.job_id}\n")
-            f.write(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M%S')}\n\n")
+            f.write(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
             
         # Init JSON (Start with empty list)
         with open(self.json_file, "w", encoding="utf-8") as f:

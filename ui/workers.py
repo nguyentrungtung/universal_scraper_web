@@ -171,6 +171,7 @@ class AITestWorker(QThread):
             start_time = time.time()
             
             # Test extraction
+            # Note: LLMExtractor uses crawl4ai strategy which has aextract
             result = loop.run_until_complete(
                 strategy.aextract(url=self.url, ix=0, html="This is a test content to verify AI connection.")
             )

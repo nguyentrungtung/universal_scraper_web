@@ -137,13 +137,28 @@ class StreamResultHandler:
             # Xóa dấu phẩy cuối cùng và đóng ngoặc vuông
             with open(self.json_file, 'rb+') as f:
                 f.seek(0, 2) # Move to end
-                size = f.tell()
-                if size > 2: # Nếu có data (lớn hơn dấu mở [ và xuống dòng)
-                    f.seek(-2, 2) # Lùi lại 2 byte (dấu phẩy và xuống dòng)
-                    char = f.read(1)
-                    if char == b',':
-                        f.seek(-1, 1) # Lùi lại chỗ dấu phẩy
-                        f.truncate() # Cắt bỏ dấu phẩy
+                file_size = f.tell()
+                
+                # Check last few bytes to find the comma
+                # We might have written ",\n" or ",\r\n"
+                # Let's look back up to 10 bytes
+                search_limit = min(file_size, 10)
+                if search_limit > 0:
+                    f.seek(-search_limit, 2)
+                    tail = f.read(search_limit)
+                    
+                    # Find the last comma in the tail
+                    last_comma_index = tail.rfind(b',')
+                    
+                    if last_comma_index != -1:
+                        # Check if everything after comma is whitespace
+                        after_comma = tail[last_comma_index+1:]
+                        if after_comma.strip() == b'':
+                            # Truncate at the comma
+                            # Position of comma = (file_size - search_limit) + last_comma_index
+                            truncate_pos = (file_size - search_limit) + last_comma_index
+                            f.seek(truncate_pos)
+                            f.truncate()
             
             with open(self.json_file, "a", encoding="utf-8") as f:
                 f.write("\n]") # Đóng ngoặc

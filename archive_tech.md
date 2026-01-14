@@ -1,4 +1,4 @@
-# Project Structure & Technical Architecture (Achavie Tech)
+# Project Structure & Technical Architecture (Archive Tech)
 
 This document provides a high-level overview of the project's directory structure, technical architecture, and recent improvements.
 
@@ -9,14 +9,15 @@ crawl-tool/
 ├── main.py                 # Application entry point
 ├── requirements.txt        # Project dependencies (PySide6, crawl4ai, litellm, etc.)
 ├── gemini.md               # Detailed technical guide & workflow
-├── achavie_tech.md         # Project structure overview (this file)
+├── archive_tech.md         # Project structure overview (this file)
 ├── config/
 │   └── settings.py         # CENTRALIZED CONFIGURATION (AI, Crawl, DB, Paths, UI)
 ├── core/                   # Business Logic
-│   ├── crawler_engine.py   # WebCrawlerService (Handles loop, proxies, AI Batching, Filtering)
+│   ├── crawler_engine.py   # WebCrawlerService (Handles loop, proxies, AI Batching, Filtering, Streaming)
 │   ├── extraction.py       # LLMExtractor (AI Extraction Strategy)
 │   ├── ai_handler.py       # AI Strategy Factory
-│   └── job_service.py      # Job Management Service
+│   ├── job_service.py      # Job Management Service
+│   └── site_config.py      # Site-specific configurations (selectors, wait conditions)
 ├── database/               # Persistence Layer
 │   ├── models.py           # Database Models (JobRecord, JobSettings)
 │   └── repository.py       # SQLiteJobRepository (Job Queue Management)
@@ -32,10 +33,12 @@ crawl-tool/
 │   ├── workers.py          # Async QThreads (CrawlWorker, JobQueueWorker)
 │   └── components.py       # Reusable widgets
 ├── utils/                  # Helper Utilities
-│   ├── ai_parser.py        # Smart Markdown Splitting & JSON Parsing
-│   ├── result_handler.py   # Result saving logic
+│   ├── ai_parser.py        # JSON Parsing & Validation
+│   ├── content_splitter.py # Smart Markdown Splitting (Token/Char based)
+│   ├── result_handler.py   # Result saving logic (StreamResultHandler)
 │   ├── proxy_parser.py     # Proxy parsing
-│   └── ...
+│   ├── pagination.py       # Next page detection
+│   └── scrolling.py        # Infinite scroll logic
 ├── logs/                   # Application Logs
 │   ├── scraper.log         # General Application Log
 │   ├── ai_errors.log       # AI Error Log
@@ -55,7 +58,7 @@ All hardcoded values have been moved to a single source of truth:
 
 ### B. Robust AI Extraction Engine
 The extraction engine has been significantly upgraded to handle large documents and prevent "Context Overflow":
-1.  **Smart Markdown Splitting (`utils/ai_parser.py`)**:
+1.  **Smart Markdown Splitting (`utils/content_splitter.py`)**:
     -   Automatically splits large Markdown content into smaller blocks based on `MAX_CHARS_PER_BLOCK` (default 10,000 chars).
     -   Respects logical boundaries (newlines, link blocks) to avoid breaking data mid-record.
 2.  **Batch Processing (`core/crawler_engine.py`)**:
@@ -71,6 +74,7 @@ The extraction engine has been significantly upgraded to handle large documents 
     -   Selectors: `.ads`, `.sidebar`, `.menu`, `.social-share`.
     -   External links and social media domains.
 -   **Anti-Detect**: "Magic Mode" and Proxy Rotation support.
+-   **Streaming Output**: Data is streamed directly to disk (`utils/result_handler.py`) during the crawl to minimize RAM usage for large datasets.
 
 ### D. Job Queue System (`database/`)
 -   **SQLite Backend**: Persistent job queue using `crawl_jobs.db`.
@@ -79,6 +83,7 @@ The extraction engine has been significantly upgraded to handle large documents 
 ### E. User Interface Enhancements
 -   **Template Auto-Selection**: Selecting a Prompt Template automatically selects the corresponding Schema Template (e.g., "Real Estate" prompt -> "Real Estate" schema).
 -   **Dynamic Settings**: UI elements load defaults from `settings.py`.
+-   **Real-time Feedback**: Progress bars and console logs update in real-time as pages are crawled and data is extracted.
 
 ## 3. Workflow Summary
 
@@ -86,7 +91,7 @@ The extraction engine has been significantly upgraded to handle large documents 
 2.  **Crawl**: `AsyncWebCrawler` fetches pages, executes JS (scrolling), and filters noise.
 3.  **Process**:
     -   HTML converted to Markdown.
-    -   Markdown split into safe blocks (`ai_parser.py`).
+    -   Markdown split into safe blocks (`content_splitter.py`).
     -   Blocks sent to AI Provider (LiteLLM) in batches.
 4.  **Extract**: AI returns JSON -> Parsed & Validated -> Deduplicated.
-5.  **Save**: Results saved to `outputs/` (Markdown + JSON). Logs recorded in `logs/`.
+5.  **Stream & Save**: Results are appended to `outputs/[job_id].json` immediately. Markdown is saved to `outputs/[job_id].md`.

@@ -335,7 +335,20 @@ class MainWindow(QMainWindow):
 
     def handle_finished(self, result):
         self.console.append_log("--- CRAWL FINISHED ---")
-        saved_files = ResultHandler.save_result(result, self.console.append_log)
+        
+        # Check if files were already saved during streaming
+        saved_files = result.get("output_files", [])
+        if saved_files is None:
+            saved_files = []
+            
+        # Also try to save any remaining data (legacy support or non-streaming mode)
+        legacy_files = ResultHandler.save_result(result, self.console.append_log)
+        if legacy_files:
+            saved_files.extend(legacy_files)
+            
+        # Deduplicate
+        saved_files = list(set(saved_files))
+
         if saved_files:
             msg = "Crawl finished!\nSaved to:\n" + "\n".join(saved_files)
             QMessageBox.information(self, "Done", msg)
@@ -344,13 +357,36 @@ class MainWindow(QMainWindow):
 
     def on_job_selected(self, job_data):
         if not job_data: return
-        result_file = job_data.get("result_file")
-        if result_file and os.path.exists(result_file):
+        
+        target_file = None
+        result = job_data.get("result")
+        
+        if result and isinstance(result, dict):
+            # Check for output_files list
+            output_files = result.get("output_files", [])
+            if output_files:
+                # Prefer JSON, then MD
+                json_files = [f for f in output_files if f.endswith('.json')]
+                if json_files:
+                    target_file = json_files[0]
+                elif output_files:
+                    target_file = output_files[0]
+        
+        # Fallback for legacy jobs if any (though we just started using DB)
+        if not target_file:
+             # Maybe check if 'markdown' field is a path
+             md = result.get("markdown") if result else None
+             if md and isinstance(md, str) and os.path.exists(md):
+                 target_file = md
+
+        if target_file and os.path.exists(target_file):
             try:
-                self.console.append_log(f"Viewing Job Result: {result_file}")
-                os.startfile(result_file)
+                self.console.append_log(f"Viewing Job Result: {target_file}")
+                os.startfile(target_file)
             except Exception as e:
                 self.console.append_log(f"Error opening file: {e}")
+        else:
+            self.console.append_log("No result file found for this job.")
 
     def closeEvent(self, event):
         if hasattr(self, 'job_worker') and self.job_worker:

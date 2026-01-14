@@ -23,6 +23,7 @@ class LLMConfig(BaseModel):
     instruction: str = Field("Extract the main entities and their attributes from the page content.", description="Extraction instructions for the AI")
     response_schema: Optional[str] = Field(None, description="JSON schema for structured extraction")
     ai_split_pattern: Optional[str] = Field(None, description="Regex pattern to split markdown content for AI context (e.g., '\\n(?=\\[)').")
+    use_proxy: bool = Field(False, description="Whether to use proxy for AI requests")
 
 class ScraperInput(BaseModel):
     url: HttpUrl
@@ -31,3 +32,13 @@ class ScraperInput(BaseModel):
     extraction_schema: Optional[Dict[str, Any]] = None
     llm_config: Optional[LLMConfig] = None
     timeout: int = CRAWL_CONFIG["DEFAULT_TIMEOUT"]  # ms
+
+class CrawlRunConfig(BaseModel):
+    url: str
+    max_pages: int = 1
+    scroll_mode: bool = False
+    magic_mode: bool = False
+    scroll_depth: int = 5
+    delay: int = 0
+    proxies: Optional[list[ProxyConfig]] = None
+    llm_config: Optional[LLMConfig] = None

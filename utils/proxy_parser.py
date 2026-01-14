@@ -1,6 +1,6 @@
 import re
 from typing import Optional, List
-from models.scraper_input import ProxyConfig
+from config.schemas.scraper_input import ProxyConfig
 
 def parse_proxy_string(proxy_str: str) -> Optional[ProxyConfig]:
     """

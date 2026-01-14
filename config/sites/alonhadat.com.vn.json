@@ -1,0 +1,5 @@
+{
+    "wait_for": ".content-items",
+    "scroll_mode": true,
+    "timeout": 45000
+}

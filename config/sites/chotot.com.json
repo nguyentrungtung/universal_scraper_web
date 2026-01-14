@@ -1,0 +1,5 @@
+{
+    "wait_for": "div[class*='ListAd']",
+    "scroll_mode": true,
+    "scroll_depth": 10
+}

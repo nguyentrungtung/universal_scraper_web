@@ -1,0 +1,8 @@
+{
+    "wait_until": "domcontentloaded",
+    "wait_for": "body",
+    "js_code": [],
+    "timeout": 60000,
+    "scroll_mode": false,
+    "scroll_depth": 5
+}

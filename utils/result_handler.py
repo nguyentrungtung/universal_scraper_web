@@ -7,6 +7,7 @@ from typing import Dict, Any, List
 from loguru import logger
 from utils.file_manager import ensure_dir
 from config.settings import PATHS_CONFIG
+from core.interfaces import IStorageService
 
 def _get_domain_from_url(url: str) -> str:
     try:
@@ -70,9 +71,10 @@ class ResultHandler:
 
         return saved_files
 
-class StreamResultHandler:
+class StreamResultHandler(IStorageService):
     """
     Xử lý việc lưu dữ liệu theo luồng (Stream) để tiết kiệm bộ nhớ.
+    Implements IStorageService interface.
     """
     def __init__(self, job_id: str = None, url: str = None):
         self.timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -107,13 +109,17 @@ class StreamResultHandler:
         with open(self.json_file, "w", encoding="utf-8") as f:
             f.write("[\n")
 
-    def append_markdown(self, content: str):
+    def append_content(self, content: str):
         """Ghi nối nội dung markdown vào file"""
         try:
             with open(self.md_file, "a", encoding="utf-8") as f:
                 f.write(content + "\n\n")
         except Exception as e:
             logger.error(f"Failed to append markdown: {e}")
+            
+    # Alias for backward compatibility if needed, but prefer interface method
+    def append_markdown(self, content: str):
+        self.append_content(content)
 
     def append_data(self, items: List[Dict]):
         """Ghi nối dữ liệu JSON vào file (xử lý dấu phẩy)"""
@@ -131,7 +137,7 @@ class StreamResultHandler:
         except Exception as e:
             logger.error(f"Failed to append JSON data: {e}")
 
-    def finalize(self):
+    def finalize(self) -> List[str]:
         """Đóng file JSON đúng cú pháp"""
         try:
             # Xóa dấu phẩy cuối cùng và đóng ngoặc vuông

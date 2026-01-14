@@ -26,12 +26,13 @@ USER_AGENTS = [
 
 # AI Extraction Configuration
 AI_CONFIG = {
-    "MAX_CHARS_PER_BLOCK": 4000,   # Reduced to 4000 to safely fit within 4096 token context window (approx 1000-1200 tokens)
+    "MAX_CHARS_PER_BLOCK": 2000,   # Reduced to 2000 to prevent timeouts with local models
     "BATCH_SIZE": 1,               # Number of blocks to process in parallel (or sequential batch)
     "TEMPERATURE": 0.1,            # AI Creativity
     "DEFAULT_MODEL": "gpt-4o-mini",
     "CHUNK_TOKEN_THRESHOLD": 1000, # Token limit for chunking strategy
-    "OVERLAP_RATE": 0.1            # Overlap rate between chunks
+    "OVERLAP_RATE": 0.1,            # Overlap rate between chunks
+    "CONCURRENT_REQUESTS": 1       # Sequential processing by default for local models
 }
 
 # Crawler Configuration

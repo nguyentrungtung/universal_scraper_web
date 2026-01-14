@@ -1,0 +1,33 @@
+{
+    "wait_for": ".re__srp-list",
+    "js_code": [
+        "window.scrollTo(0, 0);",
+        "await new Promise(r => setTimeout(r, 1000));",
+        "window.scrollTo(0, document.body.scrollHeight/4);",
+        "await new Promise(r => setTimeout(r, 1500));",
+        "window.scrollTo(0, document.body.scrollHeight/2);",
+        "await new Promise(r => setTimeout(r, 1500));",
+        "window.scrollTo(0, document.body.scrollHeight*3/4);",
+        "await new Promise(r => setTimeout(r, 1500));",
+        "window.scrollTo(0, document.body.scrollHeight);",
+        "await new Promise(r => setTimeout(r, 2000));"
+    ],
+    "timeout": 60000,
+    "scroll_mode": false,
+    "scroll_depth": 5,
+    "exclude_selectors": [
+        "footer",
+        ".re__footer",
+        ".re__pagination",
+        ".re__contact-box",
+        ".ad-container",
+        "#chat-widget-container",
+        ".re__search-box",
+        ".re__banner",
+        ".re__right-content",
+        ".re__breadcrumb",
+        ".re__header",
+        ".re__search-filter",
+        ".re__srp-list .re__card-config"
+    ]
+}
